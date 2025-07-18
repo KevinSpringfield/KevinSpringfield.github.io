@@ -19,20 +19,23 @@
   <meta name="author" content="Kevin Huang">
   <meta name="keywords" content="">
   
-    <meta name="description" content="前言最近公司在推行用 Streamlit 來建構專案的 prototype，讓資料科學家可以快速建立可互動的 UI。我自己試玩了一下覺得很不錯，只要寫點 Python code 就能快速生出漂亮的 UI 互動元件，自己刻可能都要花上一點時間。 在做 side project 的過程中，開始對它的架構產生興趣：在前端操作完 UI 元件後，後端是怎麼接收這個事件並做出回應的呢？打開 Debugger">
+    <meta name="description" content="前言最近公司在推行用 Streamlit 來建構專案的 prototype，讓資料科學家可以快速建立可互動的 UI。我自己試玩了一下覺得很不錯，只要寫點 Python code 就能快速生出漂亮的 UI 互動元件，自己刻可能都要花上一點時間。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="拆解 Streamlit 的神秘資料流">
 <meta property="og:url" content="https://kevinspringfield.github.io/2025/07/17/%E6%8B%86%E8%A7%A3-Streamlit-%E7%9A%84%E7%A5%9E%E7%A7%98%E8%B3%87%E6%96%99%E6%B5%81/index.html">
 <meta property="og:site_name" content="凱文寫點什麼">
-<meta property="og:description" content="前言最近公司在推行用 Streamlit 來建構專案的 prototype，讓資料科學家可以快速建立可互動的 UI。我自己試玩了一下覺得很不錯，只要寫點 Python code 就能快速生出漂亮的 UI 互動元件，自己刻可能都要花上一點時間。 在做 side project 的過程中，開始對它的架構產生興趣：在前端操作完 UI 元件後，後端是怎麼接收這個事件並做出回應的呢？打開 Debugger">
+<meta property="og:description" content="前言最近公司在推行用 Streamlit 來建構專案的 prototype，讓資料科學家可以快速建立可互動的 UI。我自己試玩了一下覺得很不錯，只要寫點 Python code 就能快速生出漂亮的 UI 互動元件，自己刻可能都要花上一點時間。">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://kevinspringfield.github.io/2025/07/17/%E6%8B%86%E8%A7%A3-Streamlit-%E7%9A%84%E7%A5%9E%E7%A7%98%E8%B3%87%E6%96%99%E6%B5%81/image-1.png">
 <meta property="og:image" content="https://kevinspringfield.github.io/2025/07/17/%E6%8B%86%E8%A7%A3-Streamlit-%E7%9A%84%E7%A5%9E%E7%A7%98%E8%B3%87%E6%96%99%E6%B5%81/image-3.png">
 <meta property="og:image" content="https://kevinspringfield.github.io/2025/07/17/%E6%8B%86%E8%A7%A3-Streamlit-%E7%9A%84%E7%A5%9E%E7%A7%98%E8%B3%87%E6%96%99%E6%B5%81/image-4.png">
 <meta property="og:image" content="https://kevinspringfield.github.io/2025/07/17/%E6%8B%86%E8%A7%A3-Streamlit-%E7%9A%84%E7%A5%9E%E7%A7%98%E8%B3%87%E6%96%99%E6%B5%81/image-5.png">
 <meta property="article:published_time" content="2025-07-17T14:21:03.000Z">
-<meta property="article:modified_time" content="2025-07-18T10:47:39.657Z">
+<meta property="article:modified_time" content="2025-07-18T11:20:05.202Z">
 <meta property="article:author" content="Kevin Huang">
+<meta property="article:tag" content="streamlit">
+<meta property="article:tag" content="protobuf">
+<meta property="article:tag" content="devtools">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://kevinspringfield.github.io/2025/07/17/%E6%8B%86%E8%A7%A3-Streamlit-%E7%9A%84%E7%A5%9E%E7%A7%98%E8%B3%87%E6%96%99%E6%B5%81/image-1.png">
   
@@ -127,6 +130,30 @@
             </li>
           
         
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>Categories</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>Tags</span>
+              </a>
+            </li>
+          
+        
         
           <li class="nav-item" id="search-btn">
             <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
@@ -150,7 +177,7 @@
   
 
 <div id="banner" class="banner" parallax=true
-     style="background: url('/images/post/L1030995.jpg') no-repeat center center; background-size: cover;">
+     style="background: url('/images/banner/L1030995.jpg') no-repeat center center; background-size: cover;">
   <div class="full-bg-img">
     <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
       <div class="banner-text text-center fade-in-up">
@@ -233,6 +260,8 @@
               <div class="markdown-body">
                 
                 <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>最近公司在推行用 Streamlit 來建構專案的 prototype，讓資料科學家可以快速建立可互動的 UI。我自己試玩了一下覺得很不錯，只要寫點 Python code 就能快速生出漂亮的 UI 互動元件，自己刻可能都要花上一點時間。</p>
+<span id="more"></span>
+
 <p>在做 side project 的過程中，開始對它的架構產生興趣：在前端操作完 UI 元件後，後端是怎麼接收這個事件並做出回應的呢？打開 Debugger Tool 翻遍了所有 request 都沒看到疑似交換資料的 API call。</p>
 <img src="/2025/07/17/%E6%8B%86%E8%A7%A3-Streamlit-%E7%9A%84%E7%A5%9E%E7%A7%98%E8%B3%87%E6%96%99%E6%B5%81/image-1.png" srcset="/img/loading.gif" lazyload class="">
 
@@ -277,6 +306,38 @@
             <div>
               <div class="post-metas my-3">
   
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E8%A1%93%E7%AD%86%E8%A8%98/" class="category-chain-item">技術筆記</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/streamlit/" class="print-no-link">#streamlit</a>
+      
+        <a href="/tags/protobuf/" class="print-no-link">#protobuf</a>
+      
+        <a href="/tags/devtools/" class="print-no-link">#devtools</a>
+      
+    </div>
   
 </div>
 
@@ -335,7 +396,7 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2025/07/16/hello-from-Kevin/hello-from-Kevin/" title="Hello from Kevin">
+                      <a href="/2025/07/16/hello-from-Kevin/" title="Hello from Kevin">
                         <span class="hidden-mobile">Hello from Kevin</span>
                         <span class="visible-mobile">Next</span>
                         <i class="iconfont icon-arrowright"></i>
