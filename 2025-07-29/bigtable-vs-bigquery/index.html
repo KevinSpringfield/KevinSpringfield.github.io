@@ -1,0 +1,732 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/images/favicon/favicon_64_64.png">
+  <link rel="icon" href="/images/favicon/favicon_64_64.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Kevin Huang">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="比較 GCP 兩大資料服務 Bigtable 與 BigQuery 的本質、用途與特性，幫助初學者快速分辨兩者差異與適用場景。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Bigtable 和 BigQuery 都很 Big! 他們真的一樣嗎？">
+<meta property="og:url" content="https://kevinspringfield.github.io/2025-07-29/bigtable-vs-bigquery/index.html">
+<meta property="og:site_name" content="凱文寫點什麼">
+<meta property="og:description" content="比較 GCP 兩大資料服務 Bigtable 與 BigQuery 的本質、用途與特性，幫助初學者快速分辨兩者差異與適用場景。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://kevinspringfield.github.io/2025-07-29/bigtable-vs-bigquery/image-1.png">
+<meta property="article:published_time" content="2025-07-29T21:50:50.000Z">
+<meta property="article:modified_time" content="2025-10-04T05:17:12.259Z">
+<meta property="article:author" content="Kevin Huang">
+<meta property="article:tag" content="GCP">
+<meta property="article:tag" content="Bigtable">
+<meta property="article:tag" content="BigQuery">
+<meta property="article:tag" content="Beginner">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://kevinspringfield.github.io/2025-07-29/bigtable-vs-bigquery/image-1.png">
+  
+  
+  
+  <title>Bigtable 和 BigQuery 都很 Big! 他們真的一樣嗎？ - 凱文寫點什麼</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"kevinspringfield.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>凱文寫點什麼</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>Home</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>Categories</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>Tags</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/images/banner/L1030995.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Bigtable 和 BigQuery 都很 Big! 他們真的一樣嗎？"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-07-30 05:50" pubdate>
+          July 30, 2025 am
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          987 words
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          9 mins
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Bigtable 和 BigQuery 都很 Big! 他們真的一樣嗎？</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h3 id="前言"><a href="#前言" class="headerlink" title="前言:"></a>前言:</h3><p>GCP 中的 Bigtable 和 BigQuery 對初學者來說很容易混淆，「都是資料庫而且都有 big 字首，用起來應該差不多吧?」這個就是我拋出來的疑問。在閱讀完<a target="_blank" rel="noopener" href="https://cloud.google.com/blog/topics/developers-practitioners/bigtable-vs-bigquery-whats-difference">這篇</a> GCP blog 的文章後做了此摘要。</p>
+<div style="width: 100%; display: flex; justify-content: center;">
+  <div><img src="/2025-07-29/bigtable-vs-bigquery/image-1.png" srcset="/img/loading.gif" lazyload class=""></div>
+</div>
+
+<span id="more"></span>
+
+<h3 id="從本質上來區分"><a href="#從本質上來區分" class="headerlink" title="從本質上來區分"></a>從本質上來區分</h3><p><b>Bigtable</b> 是一個 wide-column NoSQL database 用在需要低延遲，高吞吐量的使用情境，適合用作 OLTP (Online Transaction Processing)</p>
+<blockquote>
+<p>Bigtable is a NoSQL wide-column database optimized for heavy reads and writes.</p>
+</blockquote>
+<p><b>BigQuery</b> 則是企業級資料倉儲，用來作 OLAP (Online Analytical Processing) 用途</p>
+<blockquote>
+<p>BigQuery is an enterprise data warehouse for large amounts of relational structured data.</p>
+</blockquote>
+<h3 id="特性比較"><a href="#特性比較" class="headerlink" title="特性比較"></a>特性比較</h3><table>
+<thead>
+<tr>
+<th>特性項目</th>
+<th><strong>Bigtable</strong></th>
+<th><strong>BigQuery</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>類型</td>
+<td>Wide-Column NoSQL</td>
+<td>Data Warehouse</td>
+</tr>
+<tr>
+<td>主要用途</td>
+<td>即時寫入讀出、OLTP (無 Transaction)</td>
+<td>離線分析、報表查詢、OLAP</td>
+</tr>
+<tr>
+<td>應用場合</td>
+<td>高吞吐量的應用程式（IoT、AdTech、ML 等）</td>
+<td>大量資料分析、報表統計、BI、SQL 查詢、ML</td>
+</tr>
+<tr>
+<td>查詢方式</td>
+<td>以 Row Key 為主的 API &#x2F; SDK 操作</td>
+<td>標準 SQL 查詢</td>
+</tr>
+<tr>
+<td>延遲表現</td>
+<td>毫秒等級</td>
+<td>秒～十秒以上</td>
+</tr>
+<tr>
+<td>吞吐量擴展</td>
+<td>水平擴展：每加一節點可處理約 10,000 QPS</td>
+<td>虛擬資源，根據查詢負載自動擴展</td>
+</tr>
+<tr>
+<td>資料寫入方式</td>
+<td>高頻寫入，每筆資料可自定欄位，適合大資料量</td>
+<td>批次或串流寫入，用於歷史資料分析</td>
+</tr>
+<tr>
+<td>資料量規模</td>
+<td>TB ～ PB 級</td>
+<td>PB 級</td>
+</tr>
+<tr>
+<td>整合性</td>
+<td>支援 HBase API；整合 Hadoop、Dataflow、Dataproc</td>
+<td>整合 Looker、Data Studio、AI Platform 等</td>
+</tr>
+<tr>
+<td>計費方式</td>
+<td>根據節點與儲存空間收費</td>
+<td>根據掃描資料量計費</td>
+</tr>
+</tbody></table>
+<h3 id="Bigtable-和-BigQuery-共同的特性"><a href="#Bigtable-和-BigQuery-共同的特性" class="headerlink" title="Bigtable 和 BigQuery 共同的特性"></a>Bigtable 和 BigQuery 共同的特性</h3><ol>
+<li>兩個都是雲原生的設計，能夠享用供應商提供的託管服務及雲端架構的優勢</li>
+<li>高達 99.99% SLA</li>
+<li>自動 Sharding 不用在人工處理邏輯</li>
+<li>自動故障修復</li>
+</ol>
+<h3 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h3><p>原文中提到：</p>
+<blockquote>
+<p>It is safe to say that you would serve an application that uses Bigtable as the database but most of the times you wouldn’t have applications performing BigQuery queries.</p>
+</blockquote>
+<p>這句話讓我反思公司內部的使用情境。有些專案團隊確實使用 BigQuery 作為應用程式的資料庫，但也因此遇到 API 回應時間的效能瓶頸。這可能是因為查詢需要大量資料聚合，例如繪製圖表時的操作。雖然 BigQuery 的基本開銷較高，但在某些情境下，省下的時間效益可能超過成本。</p>
+<h4 id="可能在公司使用-Bigtable-的情境"><a href="#可能在公司使用-Bigtable-的情境" class="headerlink" title="可能在公司使用 Bigtable 的情境"></a>可能在公司使用 Bigtable 的情境</h4><p>我們部門主要進行資料視覺化，應用程式需要即時撈取所選區間的資料並繪製成圖表。這類情境通常是讀多寫少，QPS 很低，但對 API 回應時間要求很高，且不需要 Transaction。基於 Bigtable 的低延遲特性，它可能是這類應用程式的理想選擇。</p>
+<h4 id="可能在公司使用-BigQuery-的情境"><a href="#可能在公司使用-BigQuery-的情境" class="headerlink" title="可能在公司使用 BigQuery 的情境"></a>可能在公司使用 BigQuery 的情境</h4><p>我曾設計過一個 Web Analytics 服務，用來追蹤系統使用者行為。這類情境不需要即時讀寫，但需要一次分析大量資料，非常適合使用 BigQuery。它的 SQL 支援和資料聚合能力能有效處理這類需求。</p>
+<p>此筆記用來幫自己快速了解兩個服務的區別，比較可惜的是原文只有大概介紹區別以及特性，沒有講太多實作，未來有機會在深入研究 Bigtable 如 row key 這樣的設計。</p>
+<h3 id="Glossary"><a href="#Glossary" class="headerlink" title="Glossary"></a>Glossary</h3><ul>
+<li>OLTP (Online Transaction Processing): 適合即時讀寫，例如用戶登入、下單。</li>
+<li>OLAP (Online Analytical Processing): 適合查大量資料做統計報表。</li>
+<li>SLA：服務可用性保證，例如 99.99% 表示一年最多可能停機 52 分鐘。<br><strong>附註</strong>：計算方式為 <code>365 天 × 24 小時 × 60 分鐘 × (1 - SLA)</code>，例如 99.99% SLA 的停機時間為 <code>365 × 24 × 60 × 0.01% = 52 分鐘</code>。</li>
+<li>NoSQL：一種不走傳統關聯式資料表設計的資料庫類型，表的設計會依據查詢的方式來設計，不會看到傳統的正規化設計。常見有 key-value（Redis）、document（MongoDB）、wide-column（Bigtable）等。</li>
+<li>雲原生：為雲端架構而設計的系統，強調自動擴展、自動修復、免維運。</li>
+<li>QPS：每秒查詢次數，數字越高代表系統越能撐過高流量的負載。</li>
+<li>Sharding：把資料分散存放到不同機器上，為了擴展與加速。</li>
+</ul>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p>GCP Blog: <a target="_blank" rel="noopener" href="https://cloud.google.com/blog/topics/developers-practitioners/bigtable-vs-bigquery-whats-difference">Bigtable vs. BigQuery: What’s the difference?</a></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E8%A1%93%E7%AD%86%E8%A8%98/" class="category-chain-item">技術筆記</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/GCP/" class="print-no-link">#GCP</a>
+      
+        <a href="/tags/Bigtable/" class="print-no-link">#Bigtable</a>
+      
+        <a href="/tags/BigQuery/" class="print-no-link">#BigQuery</a>
+      
+        <a href="/tags/Beginner/" class="print-no-link">#Beginner</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Bigtable 和 BigQuery 都很 Big! 他們真的一樣嗎？</div>
+      <div>https://kevinspringfield.github.io/2025-07-29/bigtable-vs-bigquery/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>Author</div>
+          <div>Kevin Huang</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Posted on</div>
+          <div>July 30, 2025</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>Licensed under</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - Attribution">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025-08-02/gcp-workstation-zsh/" title="誰吃了我的 zsh?! 在 GCP Workstation 使用 zsh 的方法">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">誰吃了我的 zsh?! 在 GCP Workstation 使用 zsh 的方法</span>
+                        <span class="visible-mobile">Previous</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025-07-24/2025-cruise-travel-2/" title="2025 郵輪之旅 基隆-長崎-鹿兒島-那霸 (下)">
+                        <span class="hidden-mobile">2025 郵輪之旅 基隆-長崎-鹿兒島-那霸 (下)</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>Table of Contents</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">Blog works best with JavaScript enabled</div>
+  </noscript>
+</body>
+</html>

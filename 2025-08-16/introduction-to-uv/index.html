@@ -1,0 +1,723 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/images/favicon/favicon_64_64.png">
+  <link rel="icon" href="/images/favicon/favicon_64_64.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Kevin Huang">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="本文比較一些常見的 Python 套件管理工具，介紹下一個世代的高效工具： uv">
+<meta property="og:type" content="article">
+<meta property="og:title" content="試用新世代的 Python 套件管理工具 - uv">
+<meta property="og:url" content="https://kevinspringfield.github.io/2025-08-16/introduction-to-uv/index.html">
+<meta property="og:site_name" content="凱文寫點什麼">
+<meta property="og:description" content="本文比較一些常見的 Python 套件管理工具，介紹下一個世代的高效工具： uv">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://kevinspringfield.github.io/2025-08-16/introduction-to-uv/image-0.png">
+<meta property="og:image" content="https://kevinspringfield.github.io/2025-08-16/introduction-to-uv/image-1.png">
+<meta property="og:image" content="https://kevinspringfield.github.io/2025-08-16/introduction-to-uv/image-2.png">
+<meta property="og:image" content="https://kevinspringfield.github.io/2025-08-16/introduction-to-uv/image-3.png">
+<meta property="og:image" content="https://kevinspringfield.github.io/2025-08-16/introduction-to-uv/image-4.png">
+<meta property="og:image" content="https://kevinspringfield.github.io/2025-08-16/introduction-to-uv/image-5.png">
+<meta property="article:published_time" content="2025-08-16T01:05:32.000Z">
+<meta property="article:modified_time" content="2025-10-04T05:17:12.264Z">
+<meta property="article:author" content="Kevin Huang">
+<meta property="article:tag" content="Python">
+<meta property="article:tag" content="套件管理">
+<meta property="article:tag" content="uv">
+<meta property="article:tag" content="Poetry">
+<meta property="article:tag" content="pip">
+<meta property="article:tag" content="pyenv">
+<meta property="article:tag" content="virtualenv">
+<meta property="article:tag" content="Docker">
+<meta property="article:tag" content="PEP 518">
+<meta property="article:tag" content="PEP 621">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://kevinspringfield.github.io/2025-08-16/introduction-to-uv/image-0.png">
+  
+  
+  
+  <title>試用新世代的 Python 套件管理工具 - uv - 凱文寫點什麼</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"kevinspringfield.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>凱文寫點什麼</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>Home</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>Categories</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>Tags</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/images/banner/L1030995.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="試用新世代的 Python 套件管理工具 - uv"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-08-16 09:05" pubdate>
+          August 16, 2025 am
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          919 words
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          8 mins
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">試用新世代的 Python 套件管理工具 - uv</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <img src="/2025-08-16/introduction-to-uv/image-0.png" srcset="/img/loading.gif" lazyload class="">
+
+<h2 id="什麼是-uv"><a href="#什麼是-uv" class="headerlink" title="什麼是 uv?"></a>什麼是 uv?</h2><p>在介紹 uv 前，必須提到開發的公司 Astral，也就是開發大名鼎鼎的 Python formatter <strong>ruff</strong> 的公司。他們的野心就是要打造 Python 生態系中最好用的工具。</p>
+<p>uv 就是由 Astral 開發的新一代 Python 套件與環境管理工具。<br>特色是用 Rust 寫的，主打極高速、低記憶體用量，並且把傳統上要用多個工具才能完成的功能（例如 pip、pip-tools、pipx、virtualenv、pyenv）整合到同一個 CLI 中。</p>
+<p>簡單說，uv 讓你可以：</p>
+<ul>
+<li>管理相依套件及 lock file（pyproject.toml &#x2F; uv.lock）</li>
+<li>建立與管理虛擬環境</li>
+<li>安裝與切換 Python 版本</li>
+<li>安裝 CLI 工具（類似 pipx）</li>
+<li>發佈套件到 PyPI</li>
+</ul>
+<h2 id="一起來回顧目前在開發-Python-應用程式時的作法"><a href="#一起來回顧目前在開發-Python-應用程式時的作法" class="headerlink" title="一起來回顧目前在開發 Python 應用程式時的作法"></a>一起來回顧目前在開發 Python 應用程式時的作法</h2><p>如果不使用 Docker 或是 VS Code Dev Containers 開發的話，應該不會和下面這個流程差太多。</p>
+<p>Step 1: 需要先指定 Python 版本，可能用 pyenv、pipenv 或 conda 來鎖定 Python 版本。</p>
+<p>Step 2: 如果前一步的工具沒有附帶虛擬環境，可能就要再使用 Python venv、virtualenvwrapper 或是 poetry 這樣的工具來建立虛擬環境。</p>
+<p>Step 3: 套件管理工具如 pip、poetry、conda 開始幫你解析並安裝相依套件。</p>
+<p>如果使用 poetry 的話，至少要搭配 pyenv 來一起使用，稍嫌麻煩。</p>
+<hr>
+<h2 id="uv-的優勢"><a href="#uv-的優勢" class="headerlink" title="uv 的優勢"></a>uv 的優勢</h2><p>相信有過自行管理 Python 虛擬環境的人應該都能體會這有多麻煩，而 uv 的優勢就不言而喻了。</p>
+<p>uv 讓我們可以：</p>
+<ol>
+<li>用極快的速度安裝專案需要的套件，特別利於在 CI&#x2F;CD 需要 build image，或是需要多環境的測試下減少大量的時間。</li>
+<li>在一個新環境或專案中不用頻繁地安裝切換工具，學習成本變低，提升開發者體驗（DevEx）。</li>
+<li>遵守 PEP 518&#x2F;621，使用 <code>pyproject.toml</code> 來管理相依套件，即使哪天不想用 uv，也能快速切換到支援 <code>pyproject.toml</code> 的工具如 poetry。</li>
+</ol>
+<hr>
+<h2 id="uv-常用的指令"><a href="#uv-常用的指令" class="headerlink" title="uv 常用的指令"></a>uv 常用的指令</h2><h3 id="安裝-uv（macOS-Linux）"><a href="#安裝-uv（macOS-Linux）" class="headerlink" title="安裝 uv（macOS &#x2F; Linux）"></a>安裝 uv（macOS &#x2F; Linux）</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl -LsSf https://astral.sh/uv/install.sh | sh<br></code></pre></td></tr></table></figure>
+
+<h3 id="初始化專案"><a href="#初始化專案" class="headerlink" title="初始化專案"></a>初始化專案</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">mkdir</span> demo-uv &amp;&amp; <span class="hljs-built_in">cd</span> demo-uv<br>uv init<br></code></pre></td></tr></table></figure>
+
+<h3 id="安裝-同步套件"><a href="#安裝-同步套件" class="headerlink" title="安裝&#x2F;同步套件"></a>安裝&#x2F;同步套件</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">uv add fastapi<br>uv add --dev pytest ruff<br></code></pre></td></tr></table></figure>
+
+<p>如果拿到別人給的 <code>pyproject.toml</code> 有更新，可以使用以下指令同步相依套件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">uv <span class="hljs-built_in">sync</span><br></code></pre></td></tr></table></figure>
+
+<p><code>uv sync</code> 會根據 <code>pyproject.toml</code> 和 <code>uv.lock</code> 的內容，安裝或更新專案所需的所有相依套件，確保環境與設定檔一致。</p>
+<h3 id="執行程式"><a href="#執行程式" class="headerlink" title="執行程式"></a>執行程式</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">uv run python -c <span class="hljs-string">&quot;import fastapi; print(fastapi.__version__)&quot;</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="安裝特定-Python-版本"><a href="#安裝特定-Python-版本" class="headerlink" title="安裝特定 Python 版本"></a>安裝特定 Python 版本</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">uv python install 3.12<br></code></pre></td></tr></table></figure>
+
+<h3 id="設定專案使用版本"><a href="#設定專案使用版本" class="headerlink" title="設定專案使用版本"></a>設定專案使用版本</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">uv python pin 3.12<br></code></pre></td></tr></table></figure>
+
+<h3 id="輸出成-pip-可以使用的-requirements-txt"><a href="#輸出成-pip-可以使用的-requirements-txt" class="headerlink" title="輸出成 pip 可以使用的 requirements.txt"></a>輸出成 pip 可以使用的 requirements.txt</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">uv <span class="hljs-built_in">export</span> &gt; requirements.txt<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="比較-uv-和-pip-的安裝速度"><a href="#比較-uv-和-pip-的安裝速度" class="headerlink" title="比較 uv 和 pip 的安裝速度"></a>比較 uv 和 pip 的安裝速度</h2><p>分別用 pip 和 uv 來安裝 <code>pandas</code>：</p>
+<img src="/2025-08-16/introduction-to-uv/image-1.png" srcset="/img/loading.gif" lazyload class="">
+
+<p>從上圖可以看到，pip 的安裝速度相對較慢，特別是在解析相依套件時。</p>
+<img src="/2025-08-16/introduction-to-uv/image-2.png" srcset="/img/loading.gif" lazyload class="">
+
+<p>而使用 uv 時，安裝速度明顯更快，特別是在處理相依套件的解析與安裝過程中，速度提升了 40 倍。</p>
+<hr>
+<h2 id="測試-uv-在-Docker-中的表現"><a href="#測試-uv-在-Docker-中的表現" class="headerlink" title="測試 uv 在 Docker 中的表現"></a>測試 uv 在 Docker 中的表現</h2><p>底下三個測試都用差不多的 Dockerfile，差別只在安裝 Python 套件的方式。</p>
+<h3 id="Case-1-使用-uv-pip"><a href="#Case-1-使用-uv-pip" class="headerlink" title="Case 1: 使用 uv pip"></a>Case 1: 使用 uv pip</h3><figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs dockerfile"><span class="hljs-keyword">FROM</span> python:<span class="hljs-number">3.10</span>-slim<br><br><span class="hljs-keyword">WORKDIR</span><span class="language-bash"> /app</span><br><br><span class="hljs-keyword">RUN</span><span class="language-bash"> pip install --upgrade pip &amp;&amp; pip install uv</span><br><br><span class="hljs-keyword">COPY</span><span class="language-bash"> pyproject.toml uv.lock /app</span><br><br><span class="hljs-keyword">RUN</span><span class="language-bash"> uv <span class="hljs-built_in">export</span> --no-hashes --no-dev -o requirement.txt</span><br><br><span class="hljs-keyword">RUN</span><span class="language-bash"> uv pip install --system -r requirement.txt</span><br></code></pre></td></tr></table></figure>
+<img src="/2025-08-16/introduction-to-uv/image-3.png" srcset="/img/loading.gif" lazyload class="">
+
+<h3 id="Case-2-使用-uv-sync"><a href="#Case-2-使用-uv-sync" class="headerlink" title="Case 2: 使用 uv sync"></a>Case 2: 使用 uv sync</h3><figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs dockerfile"><span class="hljs-keyword">FROM</span> python:<span class="hljs-number">3.10</span>-slim<br><br><span class="hljs-keyword">WORKDIR</span><span class="language-bash"> /app</span><br><br><span class="hljs-keyword">RUN</span><span class="language-bash"> pip install --upgrade pip &amp;&amp; pip install uv</span><br><br><span class="hljs-keyword">COPY</span><span class="language-bash"> pyproject.toml uv.lock /app</span><br><br><span class="hljs-keyword">RUN</span><span class="language-bash"> uv <span class="hljs-built_in">sync</span> --frozen --no-dev</span><br></code></pre></td></tr></table></figure>
+<img src="/2025-08-16/introduction-to-uv/image-4.png" srcset="/img/loading.gif" lazyload class="">
+
+<h3 id="Case-3-使用-pip"><a href="#Case-3-使用-pip" class="headerlink" title="Case 3: 使用 pip"></a>Case 3: 使用 pip</h3><figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs dockerfile"><span class="hljs-keyword">FROM</span> python:<span class="hljs-number">3.10</span>-slim<br><br><span class="hljs-keyword">WORKDIR</span><span class="language-bash"> /app</span><br><br><span class="hljs-keyword">RUN</span><span class="language-bash"> pip install --upgrade pip &amp;&amp; pip install uv</span><br><br><span class="hljs-keyword">COPY</span><span class="language-bash"> pyproject.toml uv.lock /app</span><br><br><span class="hljs-keyword">RUN</span><span class="language-bash"> uv <span class="hljs-built_in">export</span> --no-hashes --no-dev -o requirement.txt</span><br><br><span class="hljs-keyword">RUN</span><span class="language-bash"> pip install -r requirement.txt</span><br></code></pre></td></tr></table></figure>
+<img src="/2025-08-16/introduction-to-uv/image-5.png" srcset="/img/loading.gif" lazyload class="">
+
+<p>從這個測試可以看到，不論是使用 <code>uv pip</code> 或是 <code>uv sync</code>，花費的時間都是差不多的，而且遠快於直接使用 pip 安裝。</p>
+<hr>
+<h2 id="結論"><a href="#結論" class="headerlink" title="結論"></a>結論</h2><p>uv 最近是社群炙手可熱的套件，其優異的效能以及開發體驗讓很多開發者直接愛上。建議大家都體驗看看，如果真的有遇到問題，退回去使用 poetry 也不會是很困難的一件事。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E8%A1%93%E7%AD%86%E8%A8%98/" class="category-chain-item">技術筆記</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Python/" class="print-no-link">#Python</a>
+      
+        <a href="/tags/%E5%A5%97%E4%BB%B6%E7%AE%A1%E7%90%86/" class="print-no-link">#套件管理</a>
+      
+        <a href="/tags/uv/" class="print-no-link">#uv</a>
+      
+        <a href="/tags/Poetry/" class="print-no-link">#Poetry</a>
+      
+        <a href="/tags/pip/" class="print-no-link">#pip</a>
+      
+        <a href="/tags/pyenv/" class="print-no-link">#pyenv</a>
+      
+        <a href="/tags/virtualenv/" class="print-no-link">#virtualenv</a>
+      
+        <a href="/tags/Docker/" class="print-no-link">#Docker</a>
+      
+        <a href="/tags/PEP-518/" class="print-no-link">#PEP 518</a>
+      
+        <a href="/tags/PEP-621/" class="print-no-link">#PEP 621</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>試用新世代的 Python 套件管理工具 - uv</div>
+      <div>https://kevinspringfield.github.io/2025-08-16/introduction-to-uv/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>Author</div>
+          <div>Kevin Huang</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Posted on</div>
+          <div>August 16, 2025</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>Licensed under</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - Attribution">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025-08-29/play-mcp-with-roo-code/" title="在 Roo Code 上試玩 MCP server">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">在 Roo Code 上試玩 MCP server</span>
+                        <span class="visible-mobile">Previous</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025-08-08/make-time-reading-notes/" title="讀書心得 | 生時間:高績效時間管理術">
+                        <span class="hidden-mobile">讀書心得 | 生時間:高績效時間管理術</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>Table of Contents</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">Blog works best with JavaScript enabled</div>
+  </noscript>
+</body>
+</html>
