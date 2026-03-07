@@ -1,0 +1,691 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/images/favicon/favicon_64_64.png">
+  <link rel="icon" href="/images/favicon/favicon_64_64.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Kevin">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="最近想做個 side project 來搞個家庭記帳軟體，但是又覽著搞部屬那些，和 AI 討論後決定用 Google Apps Script 來寫一個...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="用 Google Apps Script 來作一個 Line Bot 如何">
+<meta property="og:url" content="https://my-blog.pages.dev/2026-01-10/build-line-bot-with-gas/index.html">
+<meta property="og:site_name" content="凱文寫點什麼">
+<meta property="og:description" content="最近想做個 side project 來搞個家庭記帳軟體，但是又覽著搞部屬那些，和 AI 討論後決定用 Google Apps Script 來寫一個...">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://my-blog.pages.dev/2026-01-10/build-line-bot-with-gas/image-1.png">
+<meta property="og:image" content="https://my-blog.pages.dev/2026-01-10/build-line-bot-with-gas/image-3.png">
+<meta property="og:image" content="https://my-blog.pages.dev/2026-01-10/build-line-bot-with-gas/image-4.png">
+<meta property="og:image" content="https://my-blog.pages.dev/2026-01-10/build-line-bot-with-gas/image-5.png">
+<meta property="article:published_time" content="2026-01-10T02:48:54.000Z">
+<meta property="article:modified_time" content="2026-03-07T08:36:41.111Z">
+<meta property="article:author" content="Kevin">
+<meta property="article:tag" content="Google Apps Script">
+<meta property="article:tag" content="Line Bot">
+<meta property="article:tag" content="Clasp">
+<meta property="article:tag" content="Webhook">
+<meta property="article:tag" content="timeout">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://my-blog.pages.dev/2026-01-10/build-line-bot-with-gas/image-1.png">
+  
+  
+  
+  <title>用 Google Apps Script 來作一個 Line Bot 如何 - 凱文寫點什麼</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"my-blog.pages.dev","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>凱文寫點什麼</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>Home</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>Categories</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>Tags</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/images/banner/L1030995.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="用 Google Apps Script 來作一個 Line Bot 如何"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-01-10 10:48" pubdate>
+          January 10, 2026 am
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.2k words
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          10 mins
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">用 Google Apps Script 來作一個 Line Bot 如何</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>最近看完書領悟到了一點 「要解決財務焦慮的第一步，就是要知道家庭支出」，於是開始研究了一下市面上的可以協作的記帳軟體，但不是要付費就是功能太複雜，最後決定自己開發一個來試試看。</p>
+<h2 id="目標與設計"><a href="#目標與設計" class="headerlink" title="目標與設計"></a>目標與設計</h2><p>我目前想要的功能很簡單，就是有個介面可以輸入記帳項目，然後可以把交易記錄到 Google Sheet 上就好，反正要整理分析最後人工來作也不會花上太多時間。</p>
+<p>想到之前一直想要來玩玩看 Google Apps Script (以下都簡稱 GAS)，加上 GAS 又能無縫串接 Google Sheet，正好符合這次的需求。</p>
+<p>初步架構就決定是這樣了:</p>
+<div style="display: flex; justify-content: space-evenly">
+  <div style="padding: 5px; width: 40%">
+    <img src="/2026-01-10/build-line-bot-with-gas/image-1.png" srcset="/img/loading.gif" lazyload class="">
+  </div>
+</div>
+
+
+<h2 id="開發過程"><a href="#開發過程" class="headerlink" title="開發過程"></a>開發過程</h2><p>全程 Vibe coding 都讓 AI 寫，我只負責測試以及驗收功能，還有設定 Line Channel 這些後台設定而已。</p>
+<p>GAS 其實就是一個 PaaS 服務，使用者只需要照自己的業務邏輯撰寫程式碼，後面的執行環境、部屬等等 GAS 都會幫你準備好，讓像我這樣的懶人可以很快的直接看到成果。難怪很多人會拿 GAS 當作軟體工程啟蒙，這比寫爬蟲什麼有趣多了。</p>
+<p>要開發 GAS 可以直接在 GAS 的網頁上開發;或是像我一樣在自己的 IDE 上開發完，再利用 <code>clasp</code> 這個 CLI 工具推送到 GAS 上完成部屬，後者的好處是會有一份程式碼在 local，可以使用 IDE 或是 AI 工具協助開發。（相信我你不會想在 IDE 寫完程式碼，然後用複製貼上的方式去網頁版編輯器）</p>
+<p>GAS 執行時的運作也很簡單，就是兩個入口：</p>
+<figure class="highlight wren"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs wren"><span class="hljs-variable">function</span> <span class="hljs-title function_">doGet</span>(<span class="hljs-params">e</span>) &#123;&#125;<br><br><span class="hljs-variable">function</span> <span class="hljs-title function_">doPost</span>(<span class="hljs-params">e</span>) &#123;&#125;<br><br></code></pre></td></tr></table></figure>
+
+<p>我們把需要的 callback 邏輯寫在這兩個函式中，以我的案例要接 Line Messaging API 打過來的請求，大概會長這樣：</p>
+<figure class="highlight ada"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs ada"><span class="hljs-keyword">function</span> <span class="hljs-title">doPost</span>(e) &#123;<br>  var contents = JSON.parse(e.postData.contents);<br>  var events = contents.events;<br><br>  events.forEach(<span class="hljs-keyword">function</span>(event) &#123;<br>    <span class="hljs-keyword">if</span> (event.<span class="hljs-keyword">type</span> <span class="hljs-type">=== </span><span class="hljs-symbol">&#x27;message</span>&#x27; &amp;&amp; event.message.<span class="hljs-keyword">type</span> <span class="hljs-type">=== </span><span class="hljs-symbol">&#x27;text</span>&#x27;) &#123;<br>      var eventId = event.webhookEventId;<br>      ...<br><br>      // <span class="hljs-keyword">do</span> something<br>    &#125;<br>  &#125;);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>要存取 Google Sheet 也很簡單，直接在程式碼中呼叫 <code>SpreadsheetApp.openById(sheetId);</code> 就可以透過 ID 取得，但是要注意後面在部屬的時候要設定執行身分，如果這個 sheet 只有本人可以存取，那執行身分就要設定為本人。</p>
+<p>部屬也是非常簡單，只要在網頁上點選右上角的「部屬」按鈕，就能完成部屬了。</p>
+<div style="display: flex; justify-content: space-evenly">
+  <div style="padding: 5px; width: 40%">
+    <img src="/2026-01-10/build-line-bot-with-gas/image-3.png" srcset="/img/loading.gif" lazyload class="">
+  </div>
+</div>
+
+<p>部屬成功後會得到一個像這樣的 URL: <code>https://script.google.com/macros/s/AKfycbxOFRfffExrffffsaaa63opssssss-kffsssFRffT5Y-y8hBBBBCCC/exec</code>，這個就是我們服務的對外 URL。是的你沒看錯，連 HTTPS 都幫忙搞定了。</p>
+<p>拿到這個後就可以把這個 URL 貼到 Line Channel 上的 webhook 欄位使用。當 Line Message API 接收到特定 Channel 的訊息後就會發送一個請求過來這個 URL。</p>
+<p>到這邊其實就算是完成一個簡單的 Line Bot 了。</p>
+<h2 id="遇到的問題"><a href="#遇到的問題" class="headerlink" title="遇到的問題"></a>遇到的問題</h2><h3 id="在-Line-Developer-頁面測試-webhook-都不會過"><a href="#在-Line-Developer-頁面測試-webhook-都不會過" class="headerlink" title="在 Line Developer 頁面測試 webhook 都不會過"></a>在 Line Developer 頁面測試 webhook 都不會過</h3><p>這個我真的卡了一陣，但最後找到保哥 2025 的貼文，知道Bot 還是能正常回應就不管他了。</p>
+<div style="display: flex; justify-content: space-evenly; margin-bottom: 20px">
+  <div style="padding: 5px; width: 100%">
+    <img src="/2026-01-10/build-line-bot-with-gas/image-4.png" srcset="/img/loading.gif" lazyload class="">
+  </div>
+</div>
+
+<div style="display: flex; justify-content: space-evenly">
+  <div style="padding: 5px; width: 100%">
+    <img src="/2026-01-10/build-line-bot-with-gas/image-5.png" srcset="/img/loading.gif" lazyload class="">
+  </div>
+</div>
+
+<h3 id="沒有-Log-超難-debug"><a href="#沒有-Log-超難-debug" class="headerlink" title="沒有 Log 超難 debug!"></a>沒有 Log 超難 debug!</h3><p>GAS 在開啟「所有人都能呼叫」時，在執行項目那邊會看不到 log，即使呼叫的人是自己，GAS 也會把 log 隱藏。</p>
+<p>有看到社團有人是把 log 寫到另一份 Google sheet，或是乾脆通靈 (?!)。我是為了看 log 把這個專案綁定到我的 GCP 專案中，就可以在 Cloud Logging 上看到 log 了。</p>
+<h3 id="執行太慢，超過-Line-Messaging-API-的-1s-timeout-時間"><a href="#執行太慢，超過-Line-Messaging-API-的-1s-timeout-時間" class="headerlink" title="執行太慢，超過 Line Messaging API 的 1s timeout 時間"></a>執行太慢，超過 Line Messaging API 的 1s timeout 時間</h3><p>這個是目前唯一沒解決的問題，從 Line Messaging API server 發送過來的請求要在 1s 內回覆 <code>HTTP 200</code> 不然就會被視為失敗，觸發 Line Messaging API 的重試機制，會每隔一段時間重新發送重複的訊息 (記帳 sheet 上會多出一堆相同的紀錄)。</p>
+<p>為了解決這個問題我也嘗試把執行時間較久的 callback 改成先建立一個 Time Trigger 在一秒後執行寫入 Google sheet 的操作。但我怎麼樣都無法把執行時間壓在一秒內，最後還是會觸發重試。</p>
+<p>另一方面針對重試發過來的請求可以用一個 cache 阻擋他，至少讓重複的資料不要寫入 Google sheet。</p>
+<p>這個問題最後還是沒解決，雖然一切都能正常運作，但是看到 log 中有 Line Messaging API 送過來的請求還是會很阿雜。</p>
+<h2 id="結論"><a href="#結論" class="headerlink" title="結論"></a>結論</h2><p>作為一個全託管服務，GAS 以他親民的使用方式讓很多非工程師也能快速自動化工作，除了 Google Sheet，GAS 也能串接其他 SaaS 服務如 Drive, Forms 甚至是 Big Query 等等，如果工作上都會用到這些服務，GAS 不失為一個自動化的選擇！</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E8%A1%93%E7%AD%86%E8%A8%98/" class="category-chain-item">技術筆記</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Google-Apps-Script/" class="print-no-link">#Google Apps Script</a>
+      
+        <a href="/tags/Line-Bot/" class="print-no-link">#Line Bot</a>
+      
+        <a href="/tags/Clasp/" class="print-no-link">#Clasp</a>
+      
+        <a href="/tags/Webhook/" class="print-no-link">#Webhook</a>
+      
+        <a href="/tags/timeout/" class="print-no-link">#timeout</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>用 Google Apps Script 來作一個 Line Bot 如何</div>
+      <div>https://my-blog.pages.dev/2026-01-10/build-line-bot-with-gas/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>Author</div>
+          <div>Kevin</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Posted on</div>
+          <div>January 10, 2026</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>Licensed under</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - Attribution">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026-02-22/brain-automation-and-input/" title="腦中毫無想法是因為 Input 太少">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">腦中毫無想法是因為 Input 太少</span>
+                        <span class="visible-mobile">Previous</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025-12-13/cka-preparation/" title="CKA 考試心得">
+                        <span class="hidden-mobile">CKA 考試心得</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>Table of Contents</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">Blog works best with JavaScript enabled</div>
+  </noscript>
+</body>
+</html>

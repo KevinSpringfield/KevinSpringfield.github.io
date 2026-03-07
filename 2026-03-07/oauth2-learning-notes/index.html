@@ -1,0 +1,667 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/images/favicon/favicon_64_64.png">
+  <link rel="icon" href="/images/favicon/favicon_64_64.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Kevin">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="OAuth 2.0 是一個開放標準的授權協定，主要用來解決如何在「不給出帳號密碼」的情況下，安全地讓第三方應用程式存取使用者在某個服務上的受保護資源。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OAuth 2.0 學習筆記">
+<meta property="og:url" content="https://my-blog.pages.dev/2026-03-07/oauth2-learning-notes/index.html">
+<meta property="og:site_name" content="凱文寫點什麼">
+<meta property="og:description" content="OAuth 2.0 是一個開放標準的授權協定，主要用來解決如何在「不給出帳號密碼」的情況下，安全地讓第三方應用程式存取使用者在某個服務上的受保護資源。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://my-blog.pages.dev/2026-03-07/oauth2-learning-notes/image-1.svg">
+<meta property="article:published_time" content="2026-03-07T07:08:15.000Z">
+<meta property="article:modified_time" content="2026-03-07T08:36:41.143Z">
+<meta property="article:author" content="Kevin">
+<meta property="article:tag" content="OAuth 2.0">
+<meta property="article:tag" content="資安">
+<meta property="article:tag" content="授權">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://my-blog.pages.dev/2026-03-07/oauth2-learning-notes/image-1.svg">
+  
+  
+  
+  <title>OAuth 2.0 學習筆記 - 凱文寫點什麼</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"my-blog.pages.dev","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>凱文寫點什麼</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>Home</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>Categories</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>Tags</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/images/banner/L1030995.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="OAuth 2.0 學習筆記"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-03-07 15:08" pubdate>
+          March 7, 2026 pm
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.1k words
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          10 mins
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">OAuth 2.0 學習筆記</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>OAuth 2.0 是一個開放標準的授權協定，主要用來解決如何在「不給出帳號密碼」的情況下，安全地讓第三方應用程式存取使用者在某個服務上的受保護資源。</p>
+<span id="more"></span>
+
+<h2 id="OAuth-2-0-的四種核心角色"><a href="#OAuth-2-0-的四種核心角色" class="headerlink" title="OAuth 2.0 的四種核心角色"></a>OAuth 2.0 的四種核心角色</h2><p>在了解 OAuth 2.0 的運作之前，我們需要先認識參與其中的四個關鍵角色：</p>
+<ol>
+<li><strong>Resource Owner (資源擁有者)</strong>：通常就是指「使用者本人」。使用者擁有那些客戶端準備代為存取的受保護資源。</li>
+<li><strong>Resource Server (資源伺服器)</strong>：實際裝載並保管使用者受保護資源的地方。</li>
+<li><strong>Client (用戶端 &#x2F; 第三方應用程式)</strong>：代替使用者去存取受保護資源的應用程式。</li>
+<li><strong>Authorization Server (授權伺服器)</strong>：負責驗證使用者的身分與授權意願，並核發 Token 給第三方應用程式的伺服器。</li>
+</ol>
+<h2 id="OAuth-2-0-的基本運作流程"><a href="#OAuth-2-0-的基本運作流程" class="headerlink" title="OAuth 2.0 的基本運作流程"></a>OAuth 2.0 的基本運作流程</h2><p>OAuth 的核心精神在於透過授權碼與 Token 交換權限，一個最標準的基本流程可以拆解為以下四個步驟：</p>
+<ul>
+<li><strong>步驟 A</strong>：使用者在 Authorization Server 進行登入，並同意授權給 Client。</li>
+<li><strong>步驟 B</strong>：Authorization Server 確認授權後，回傳一組授權碼 (Authorization Code) 給 Client。</li>
+<li><strong>步驟 C</strong>：Client 拿著這組授權碼，去向 Authorization Server 換取 Access Token (存取權杖)。</li>
+<li><strong>步驟 D</strong>：Client 拿著 Access Token，正式向 Resource Server 請求並取得受保護的資料。</li>
+</ul>
+<h2 id="四種常見的授權模式-Authorization-Grants"><a href="#四種常見的授權模式-Authorization-Grants" class="headerlink" title="四種常見的授權模式 (Authorization Grants)"></a>四種常見的授權模式 (Authorization Grants)</h2><p>根據不同的應用場景需求，OAuth 2.0 定義了四種授權模式。這些模式實際上都是基於上述的「基本流程」進行適當的微調或刪減而來：</p>
+<ol>
+<li><strong>Authorization Code (授權碼模式)</strong></li>
+<li><strong>Implicit (隱式授權模式)</strong></li>
+<li><strong>Client Credentials (用戶端憑證模式)</strong></li>
+<li><strong>Resource Owner Password Credentials (使用者密碼模式)</strong></li>
+</ol>
+<h3 id="1-Authorization-Code-授權碼模式"><a href="#1-Authorization-Code-授權碼模式" class="headerlink" title="1. Authorization Code (授權碼模式)"></a>1. Authorization Code (授權碼模式)</h3><p>這是最常見、也是<strong>安全性最高</strong>的模式。它的流程就是完整走完上述基本流程的 A 到 D 步驟。</p>
+<p>在這個模式中，回傳的「授權碼」本身並不能直接用來存取資源，而且它的有效期限極短。Client 必須在後端伺服器拿著這個授權碼去 Authorization Server 換取 Access Token，才能真正去存取目標資源。這樣的設計能確保 Access Token 不會在瀏覽器或前端外洩。</p>
+<p>下面來看一個我們最常見的例子：</p>
+<p><img src="/2026-03-07/oauth2-learning-notes/image-1.svg" srcset="/img/loading.gif" lazyload alt="OAuth 2.0 Authorization Code Flow"></p>
+<h3 id="2-Implicit-Grant-隱式授權模式"><a href="#2-Implicit-Grant-隱式授權模式" class="headerlink" title="2. Implicit Grant (隱式授權模式)"></a>2. Implicit Grant (隱式授權模式)</h3><p>這個模式<strong>跳過了「用授權碼換 Access Token」的步驟 (即跳過步驟 C)</strong>。</p>
+<p>當使用者同意授權後，Authorization Server 會直接把 Access Token 放在網址中回傳。這個模式通常應用於沒有後端的 SPA (Single-Page Application) 單頁式應用程式，讓前端可以直接拿著 Access Token 去呼叫 API。</p>
+<p>因為 Access Token 在交換過程中會直接暴露在 URL 中，這個方法非常不安全，在現代的開發中已經不被推薦使用。甚至在 OAuth 2.1 中已經被棄用。</p>
+<h3 id="3-Client-Credentials-用戶端憑證模式"><a href="#3-Client-Credentials-用戶端憑證模式" class="headerlink" title="3. Client Credentials (用戶端憑證模式)"></a>3. Client Credentials (用戶端憑證模式)</h3><p>這個模式<strong>跳過了需要使用者參與的步驟 A 與 B</strong>。</p>
+<p>在這種情境下，Client 自己本身就是資源擁有者。Client 擁有一組自己的 Secret Key，它可以直接拿著這組 Key 去向 Authorization Server 證明自己的身分，並直接換取 Access Token。通常用於內部微服務或伺服器對伺服器 (M2M) 的 API 溝通。</p>
+<h3 id="4-Resource-Owner-Password-Credentials-使用者密碼模式"><a href="#4-Resource-Owner-Password-Credentials-使用者密碼模式" class="headerlink" title="4. Resource Owner Password Credentials (使用者密碼模式)"></a>4. Resource Owner Password Credentials (使用者密碼模式)</h3><p>這個模式同樣<strong>跳過了步驟 A 與 B</strong>。</p>
+<p>作法是讓使用者直接把帳號密碼交給 Client，然後讓 Client 在步驟 C 拿著使用者的帳號密碼去向 Authorization Server 取得 Access Token。</p>
+<p>這個作法也就是把密碼完全交付給了第三方，<strong>極度不安全</strong>，所以只能用在「絕對可信任」的 Client 上，例如作業系統內建的 App 或公司自家的內部應用系統。</p>
+<h2 id="Summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><p>OAuth 2.0 是一個規範，主要用來解決如何在不給出密碼的情況下，安全地讓第三方應用程式可以存取使用者在某個服務上的資源。共有四種不同模式，其中最常被應用也是最安全的為授權碼模式。</p>
+<p>最後補充一點，包含我自己，很多人會把 OAuth 和 SSO 搞混，以為看到授權頁面就是在做登入。這其實只對了一半：SSO 通常會搭配 OIDC (OpenID Connect) 來達到「認證 (Authentication)」及「授權 (Authorization)」，而 OAuth 這個機制本身，嚴格來說只負責處理**「授權」**的部分，像是授權第三方應用存取使用者的 FB 大頭照、信箱等等。</p>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><ol>
+<li><a target="_blank" rel="noopener" href="https://datatracker.ietf.org/doc/html/rfc6749#section-1.1">RFC6749</a></li>
+<li><a target="_blank" rel="noopener" href="https://learn.microsoft.com/zh-tw/entra/identity-platform/v2-protocols">Microsoft Learn</a></li>
+</ol>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E8%A1%93%E7%AD%86%E8%A8%98/" class="category-chain-item">技術筆記</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/OAuth-2-0/" class="print-no-link">#OAuth 2.0</a>
+      
+        <a href="/tags/%E8%B3%87%E5%AE%89/" class="print-no-link">#資安</a>
+      
+        <a href="/tags/%E6%8E%88%E6%AC%8A/" class="print-no-link">#授權</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>OAuth 2.0 學習筆記</div>
+      <div>https://my-blog.pages.dev/2026-03-07/oauth2-learning-notes/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>Author</div>
+          <div>Kevin</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Posted on</div>
+          <div>March 7, 2026</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>Licensed under</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - Attribution">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026-03-04/is-color-ereader-really-suitable-for-me/" title="彩色電子閱讀器真的適合我嗎？">
+                        <span class="hidden-mobile">彩色電子閱讀器真的適合我嗎？</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>Table of Contents</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">Blog works best with JavaScript enabled</div>
+  </noscript>
+</body>
+</html>
